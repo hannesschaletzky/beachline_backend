@@ -1,0 +1,38 @@
+name: CI
+on: [push]
+jobs:
+  deploy:
+    name: 'deploy'
+    runs-on: ubuntu-latest
+    steps:
+      # https://blog.benoitblanchon.fr/github-action-run-ssh-commands/
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh/
+          echo "$SSH_KEY" > ~/.ssh/droplet.key
+          chmod 600 ~/.ssh/droplet.key
+          cat >>~/.ssh/config <<END
+          Host droplet
+            HostName $SSH_HOST
+            User root
+            IdentityFile ~/.ssh/droplet.key
+            StrictHostKeyChecking no
+          END
+        env:
+          SSH_KEY: ${{ secrets.SSHKEY }}
+          SSH_HOST: ${{ secrets.HOST }}
+
+      - name: print root
+        run: ssh droplet 'whoami'
+
+      - name: update repo
+        run: ssh droplet 'cd /repos/beachline_backend/ && git pull && npm install'
+
+      - name: build repo
+        run: ssh droplet 'cd /repos/beachline_backend/ && npm run build'
+
+      - name: copy .env to build folder
+        run: ssh droplet 'cp /repos/beachline_backend/.env /repos/beachline_backend/build/'
+
+      - name: reload pm2 process
+        run: ssh droplet 'source ~/.nvm/nvm.sh && cd /repos/beachline_backend/ && pm2 reload pm2/prod.config.js'
