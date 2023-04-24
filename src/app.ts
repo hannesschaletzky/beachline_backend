@@ -7,6 +7,6 @@ const port = process.env.PORT
 
 setupExpressServer().then((server) => {
   server.listen(port, () => {
-    console.log(`Beachstats backend running on ${hostname}:${port}/`)
+    console.log(`Beachline backend running on ${hostname}:${port}/`)
   })
 })
