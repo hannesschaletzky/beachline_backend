@@ -12,19 +12,28 @@ async function executeInsert(query: string, values: (string | number)[]) {
   }
 }
 
-export function insertTournament(tournament: Tournament) {
+export async function insertTournament(tournament: Tournament) {
   return executeInsert(
-    `INSERT INTO "Tournaments"
+    `INSERT INTO "Tournaments" (start, courts, password)
         VALUES (
           $1,
           $2,
-          $3,
-          $4)`,
+          $3)`,
     [
-      tournament.date,
-      tournament.starting_time,
+      formatToTimestamp(tournament.start),
       tournament.courts,
       tournament.password
     ]
   )
+}
+
+function formatToTimestamp(date: Date) {
+  function zeroPad(d: string | number) {
+    return ('0' + d).slice(-2)
+  }
+
+  // 2016-06-22 19:10
+  return `${date.getFullYear()}-${zeroPad(date.getMonth() + 1)}-${zeroPad(
+    date.getDay()
+  )} ${zeroPad(date.getHours())}:${zeroPad(date.getMinutes())}`
 }

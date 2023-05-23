@@ -1,7 +1,6 @@
 export interface Tournament {
-  tournament_id: number
-  date: string
-  starting_time: string
+  tournament_id?: number
+  start: Date
   courts: string
   password: string
 }
