@@ -8,8 +8,10 @@ pool.on('error', (err) => {
   process.exit(-1)
 })
 
-pool.query('SELECT NOW()').then((res) => {
-  console.log(`connected to DB at ${res.rows[0].now}`)
-})
+if (process.env.NODE_ENV == 'local') {
+  pool.query('SELECT NOW()').then((res) => {
+    console.log(`connected to ${process.env.PGDATABASE} at ${res.rows[0].now}`)
+  })
+}
 
 export default pool

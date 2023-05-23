@@ -1,7 +1,7 @@
+/* eslint-disable no-constant-condition */
 import express from 'express'
-import pool from 'db/pool'
-import { insertTournament } from 'db/queries'
-import { Tournament } from 'shared'
+import { insertTournament, insertTeam } from '../db/queries'
+import { Tournament, Team } from 'shared'
 
 export const setupExpressServer = () => {
   return new Promise<express.Express>((resolve) => {
@@ -10,14 +10,22 @@ export const setupExpressServer = () => {
       res.json('Hello World! This is the beachline backend')
     })
 
-    pool.connect()
-
-    const tournament: Tournament = {
-      start: new Date(),
-      courts: '18-20',
-      password: '123456'
+    if (true && process.env.NODE_ENV == 'local') {
+      const tournament: Tournament = {
+        start: new Date(),
+        courts: '18-20',
+        password: '123456'
+      }
+      insertTournament(tournament).then((res) => {
+        const team: Team = {
+          tournament_id: res?.rows[0].tournament_id,
+          group_id: 1,
+          player1_name: 'Hans',
+          player2_name: 'Dampf'
+        }
+        insertTeam(team)
+      })
     }
-    insertTournament(tournament)
 
     resolve(app)
   })
