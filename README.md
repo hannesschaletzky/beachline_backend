@@ -2,4 +2,4 @@
 
 # Beachline Backend
 
-A Tournament calculator
+A calculator for beach volleyball tournaments
